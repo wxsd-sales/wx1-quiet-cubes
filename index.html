@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Call the AI Agent</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    />
+    <style>
+      :root {
+        --card-w: 320px;
+        --gap: 36px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto,
+          "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+        color: #111;
+      }
+      body {
+        background: url("https://qaemailmedia.s3.amazonaws.com/9362d52f-d475-42bd-8791-d7c98b2d64c5/WX1_25_VirtualBG_1920x1080_V2_95145066412700.jpg")
+          center/cover no-repeat fixed;
+        display: grid;
+        place-items: center;
+      }
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(1.5px);
+        z-index: 0;
+      }
+      .wrap {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px;
+        gap: 28px;
+        text-align: center;
+      }
+      /* .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      } */
+
+      h1 {
+        margin: 0;
+        font-size: clamp(18px, 3.2vw, 28px);
+        font-weight: 600;
+        color: #0b0b0b;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--gap);
+      }
+      .card {
+        width: var(--card-w);
+        max-width: 85vw;
+        height: 25vw;
+        background: rgba(255, 255, 255, 0.85);
+        border: 2px solid rgba(0, 0, 0, 0.15);
+        border-radius: 14px;
+        padding: 28px 22px 26px;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        transition: transform 0.12s ease, box-shadow 0.12s ease,
+          border-color 0.12s ease;
+        user-select: none;
+      }
+      .card-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px;
+        gap: 28px;
+        text-align: center;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+        border-color: rgba(0, 0, 0, 0.25);
+      }
+      .icon {
+        font-size: 44px;
+        margin-bottom: 12px;
+      }
+      .title {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .subtitle {
+        font-size: 14px;
+        opacity: 0.8;
+        font-style: italic;
+      }
+      .status {
+        position: fixed;
+        bottom: 18px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.82);
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+        max-width: 90vw;
+        text-align: center;
+        z-index: 2;
+        white-space: pre-line;
+      }
+      .status.show {
+        opacity: 1;
+      }
+      .hidden {
+        display: none;
+      }
+      @media (max-width: 720px) {
+        .cards {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="overlay" aria-hidden="true"></div>
+
+    <main class="wrap" aria-live="polite">
+      <h1>How would you like to call into the AI Agent today?</h1>
+
+      <section class="cards">
+        <!-- Card 1: Desk Pro -->
+        <article
+          class="card"
+          id="deskproCard"
+          role="button"
+          tabindex="0"
+          aria-label="Call Using DeskPro"
+        >
+          <div class="card-content">
+            <div class="icon">
+              <i class="fa-solid fa-desktop fa-2x"></i>
+            </div>
+            <div class="title">Call Using DeskPro</div>
+            <div class="subtitle"><em>Best call quality</em></div>
+          </div>
+        </article>
+
+        <!-- Card 2: Mobile -->
+        <article
+          class="card"
+          id="mobileCard"
+          role="button"
+          tabindex="0"
+          aria-label="Call using Mobile Device"
+        >
+          <div class="card-content">
+            <div class="icon">
+              <i
+                class="fa-solid fa-mobile-screen-button fa-2x"
+                aria-hidden="true"
+              ></i>
+            </div>
+            <div class="title">Call using Mobile Device</div>
+            <div class="subtitle">
+              <em>Experience as your customers would</em>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <div id="status" class="status" role="status" aria-live="assertive"></div>
+
+    <script>
+      const WEBEX_DIAL_URL = "https://webexapis.com/v1/xapi/command/Dial";
+      const WEBEX_BEARER = "__BOT_TOKEN__";
+      const DIAL_PAYLOAD = {
+        deviceId: "__DEVICE_ID__",
+        arguments: { Number: "__DEVICE_DIAL_NUMBER__" },
+      };
+
+      const MOBILE_WEBHOOK =
+        "https://hooks.us.webexconnect.io/events/9WXJE8TOT0";
+      const MOBILE_PAYLOAD = { mobile: "__MOBILE_DIAL_NUMBER__" };
+
+      const statusEl = document.getElementById("status");
+      let hideTimer;
+      function showStatus(msg) {
+        clearTimeout(hideTimer);
+        statusEl.textContent = msg;
+        statusEl.classList.add("show");
+        hideTimer = setTimeout(() => statusEl.classList.remove("show"), 3500);
+      }
+
+      async function callDeskPro() {
+        showStatus("Dialing DeskPro…");
+        try {
+          const res = await fetch(WEBEX_DIAL_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${WEBEX_BEARER}`,
+            },
+            body: JSON.stringify(DIAL_PAYLOAD),
+          });
+
+          const text = await res.text();
+          if (!res.ok) {
+            throw new Error(text || `HTTP ${res.status}`);
+          }
+          showStatus("DeskPro dial triggered");
+          console.log("DeskPro response:", text);
+        } catch (err) {
+          console.error(err);
+          showStatus("Failed to dial DeskPro.");
+        }
+      }
+
+      async function callMobile() {
+        showStatus("Triggering mobile call…");
+        try {
+          const res = await fetch(MOBILE_WEBHOOK, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(MOBILE_PAYLOAD),
+          });
+          const text = await res.text();
+          if (!res.ok) {
+            throw new Error(text || `HTTP ${res.status}`);
+          }
+          showStatus("Mobile webhook sent");
+          console.log("Mobile response:", text);
+        } catch (err) {
+          console.error(err);
+          showStatus("Failed to trigger mobile call.");
+        }
+      }
+
+      function makeActivable(elem, handler) {
+        elem.addEventListener("click", handler);
+        elem.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handler();
+          }
+        });
+      }
+
+      makeActivable(document.getElementById("deskproCard"), callDeskPro);
+      makeActivable(document.getElementById("mobileCard"), callMobile);
+    </script>
+  </body>
+</html>

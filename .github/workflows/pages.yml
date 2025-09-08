@@ -1,0 +1,44 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Inject secrets and variables into HTML
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }} # add in Settings → Secrets and variables → Actions
+          DEVICE_ID: ${{ secrets.DEVICE_ID }}
+          DEVICE_DIAL_NUMBER: ${{secrets.DEVICE_DIAL_NUMBER}}
+          MOBILE_DIAL_NUMBER: ${{secrets.MOBILE_DIAL_NUMBER}}
+        run: |
+          mkdir -p dist
+          # Use perl to safely handle any special characters in tokens/IDs
+          perl -0777 -pe 's/__BOT_TOKEN__/$ENV{BOT_TOKEN}/g; s/__DEVICE_ID__/$ENV{DEVICE_ID}/g; s/__DEVICE_DIAL_NUMBER__/$ENV{DEVICE_DIAL_NUMBER}/g; s/__MOBILE_DIAL_NUMBER__/$ENV{MOBILE_DIAL_NUMBER}/g' index.html > dist/index.html
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
