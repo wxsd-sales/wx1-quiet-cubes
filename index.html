@@ -73,7 +73,7 @@
       .card {
         width: var(--card-w);
         max-width: 85vw;
-        height: 25vw;
+        height: 20vw;
         background: rgba(255, 255, 255, 0.85);
         border: 2px solid rgba(0, 0, 0, 0.15);
         border-radius: 14px;
@@ -216,7 +216,7 @@
       }
 
       async function callDeskPro() {
-        showStatus("Dialing DeskPro…");
+        showStatus("Calling from DeskPro…");
         try {
           const res = await fetch(WEBEX_DIAL_URL, {
             method: "POST",
@@ -231,11 +231,11 @@
           if (!res.ok) {
             throw new Error(text || `HTTP ${res.status}`);
           }
-          showStatus("DeskPro dial triggered");
+          showStatus("DeskPro call triggered");
           console.log("DeskPro response:", text);
         } catch (err) {
           console.error(err);
-          showStatus("Failed to dial DeskPro.");
+          showStatus("Failed to call from DeskPro.");
         }
       }
 
@@ -251,7 +251,7 @@
           if (!res.ok) {
             throw new Error(text || `HTTP ${res.status}`);
           }
-          showStatus("Mobile webhook sent");
+          showStatus("Mobile request sent");
           console.log("Mobile response:", text);
         } catch (err) {
           console.error(err);
