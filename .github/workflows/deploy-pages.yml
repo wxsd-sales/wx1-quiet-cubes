@@ -1,0 +1,52 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Replace secrets in HTML
+        run: |
+          # Create a copy of your HTML file and replace the placeholders
+          cp index.html index-processed.html
+
+          # Replace the placeholders with actual secret values
+          sed -i "s/__BOT_TOKEN__/${{ secrets.BOT_TOKEN }}/g" index-processed.html
+          sed -i "s/__DEVICE_ID__/${{ secrets.DEVICE_ID }}/g" index-processed.html
+          sed -i "s/__DEVICE_DIAL_NUMBER__/${{ secrets.DEVICE_DIAL_NUMBER }}/g" index-processed.html
+          sed -i "s/__MOBILE_DIAL_NUMBER__/${{ secrets.MOBILE_DIAL_NUMBER }}/g" index-processed.html
+
+          # Move the processed file to replace the original
+          mv index-processed.html index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "."
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
