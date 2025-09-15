@@ -195,16 +195,46 @@
     <div id="status" class="status" role="status" aria-live="assertive"></div>
 
     <script>
+      // Function to get URL parameters
+      function getURLParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+          botToken: params.get("bot_token"),
+          deviceId: params.get("device_id"),
+          deviceDialNumber: params.get("device_dial_number"),
+          mobileDialNumber: params.get("mobile_dial_number"),
+        };
+      }
+
+      // Get URL parameters
+      const urlParams = getURLParams();
+
+      // Configuration with URL params as priority, GitHub variables as fallback
+      const WEBEX_BEARER = urlParams.botToken || "__BOT_TOKEN__";
+      const DEVICE_ID = urlParams.deviceId || "__DEVICE_ID__";
+      const DEVICE_DIAL_NUMBER =
+        urlParams.deviceDialNumber || "__DEVICE_DIAL_NUMBER__";
+      const MOBILE_DIAL_NUMBER =
+        urlParams.mobileDialNumber || "__MOBILE_DIAL_NUMBER__";
+
+      // API configuration
       const WEBEX_DIAL_URL = "https://webexapis.com/v1/xapi/command/Dial";
-      const WEBEX_BEARER = "__BOT_TOKEN__";
       const DIAL_PAYLOAD = {
-        deviceId: "__DEVICE_ID__",
-        arguments: { Number: "__DEVICE_DIAL_NUMBER__" },
+        deviceId: DEVICE_ID,
+        arguments: { Number: DEVICE_DIAL_NUMBER },
       };
 
       const MOBILE_WEBHOOK =
         "https://hooks.us.webexconnect.io/events/9WXJE8TOT0";
-      const MOBILE_PAYLOAD = { mobile: "__MOBILE_DIAL_NUMBER__" };
+      const MOBILE_PAYLOAD = { mobile: MOBILE_DIAL_NUMBER };
+
+      // Debug logging to console (remove in production)
+      console.log("Configuration loaded:", {
+        botTokenSource: urlParams.botToken ? "URL" : "GitHub",
+        deviceIdSource: urlParams.deviceId ? "URL" : "GitHub",
+        deviceDialSource: urlParams.deviceDialNumber ? "URL" : "GitHub",
+        mobileDialSource: urlParams.mobileDialNumber ? "URL" : "GitHub",
+      });
 
       const statusEl = document.getElementById("status");
       let hideTimer;
