@@ -10,7 +10,7 @@
     />
     <style>
       :root {
-        --card-w: 320px;
+        --card-w: 380px;
         --gap: 36px;
       }
       * {
@@ -25,16 +25,16 @@
         color: #111;
       }
       body {
-        background: url("https://qaemailmedia.s3.amazonaws.com/9362d52f-d475-42bd-8791-d7c98b2d64c5/WX1_25_VirtualBG_1920x1080_V2_95145066412700.jpg")
-          center/cover no-repeat fixed;
+        background: url("assets/Landing_Screen_BG.png") center/cover no-repeat
+          fixed;
         display: grid;
         place-items: center;
       }
       .overlay {
         position: fixed;
         inset: 0;
-        background: rgba(255, 255, 255, 0.75);
-        backdrop-filter: blur(1.5px);
+        /* background: rgba(255, 255, 255, 0.75); */
+        /* backdrop-filter: blur(1.5px); */
         z-index: 0;
       }
       .wrap {
@@ -44,6 +44,7 @@
         flex-direction: column;
         align-items: center;
         padding: 24px;
+        padding-top: 280px;
         gap: 28px;
         text-align: center;
       }
@@ -75,24 +76,30 @@
         max-width: 85vw;
         height: 20vw;
         background: rgba(255, 255, 255, 0.85);
-        border: 2px solid rgba(0, 0, 0, 0.15);
+        /* border: 2px solid rgba(0, 0, 0, 0.15); */
         border-radius: 14px;
-        padding: 28px 22px 26px;
+        padding: 0;
         box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
         cursor: pointer;
         transition: transform 0.12s ease, box-shadow 0.12s ease,
           border-color 0.12s ease;
         user-select: none;
+        overflow: hidden;
       }
       .card-content {
         position: relative;
         z-index: 1;
+        width: 100%;
+        height: 100%;
         display: flex;
-        flex-direction: column;
         align-items: center;
-        padding: 24px;
-        gap: 28px;
-        text-align: center;
+        justify-content: center;
+      }
+      .card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 12px;
       }
       .card:hover {
         transform: translateY(-2px);
@@ -148,7 +155,7 @@
     <div class="overlay" aria-hidden="true"></div>
 
     <main class="wrap" aria-live="polite">
-      <h1>How would you like to call into the AI Agent today?</h1>
+      <!-- <h1>How would you like to call into the AI Agent today?</h1> -->
 
       <section class="cards">
         <!-- Card 1: Desk Pro -->
@@ -160,11 +167,11 @@
           aria-label="Call Using DeskPro"
         >
           <div class="card-content">
-            <div class="icon">
-              <i class="fa-solid fa-desktop fa-2x"></i>
-            </div>
-            <div class="title">Call Using DeskPro</div>
-            <div class="subtitle"><em>Best call quality</em></div>
+            <img
+              src="assets/BTN_Desk Pro.png"
+              alt="Call Using DeskPro"
+              class="card-image"
+            />
           </div>
         </article>
 
@@ -177,16 +184,11 @@
           aria-label="Call using Mobile Device"
         >
           <div class="card-content">
-            <div class="icon">
-              <i
-                class="fa-solid fa-mobile-screen-button fa-2x"
-                aria-hidden="true"
-              ></i>
-            </div>
-            <div class="title">Call using Mobile Device</div>
-            <div class="subtitle">
-              <em>Experience as your customers would</em>
-            </div>
+            <img
+              src="assets/BTN_Phone.png"
+              alt="Call using Mobile Device"
+              class="card-image"
+            />
           </div>
         </article>
       </section>
