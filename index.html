@@ -10,8 +10,8 @@
     />
     <style>
       :root {
-        --card-w: 380px;
-        --gap: 36px;
+        --card-w: 800px;
+        --gap: 70px;
       }
       * {
         box-sizing: border-box;
@@ -25,8 +25,8 @@
         color: #111;
       }
       body {
-        background: url("./assets/Landing_screen_BG.png") center/cover no-repeat
-          fixed;
+        background: url("./assets/Landing-screen-full-logo-only.png")
+          center/cover no-repeat fixed;
         display: grid;
         place-items: center;
       }
@@ -43,10 +43,15 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         padding: 24px;
-        padding-top: 280px;
-        gap: 28px;
+        gap: 40px;
         text-align: center;
+        min-height: 100vh;
+      }
+      .wrap.has-cards {
+        padding-top: 1000px;
+        justify-content: flex-start;
       }
       /* .sr-only {
         position: absolute;
@@ -73,9 +78,9 @@
       }
       .card {
         width: var(--card-w);
-        max-width: 85vw;
-        height: 20vw;
-        background: rgba(255, 255, 255, 0.85);
+        /* max-width: 85vw;
+        height: 450px;
+        background: rgba(255, 255, 255, 0.85); */
         /* border: 2px solid rgba(0, 0, 0, 0.15); */
         border-radius: 14px;
         padding: 0;
@@ -142,11 +147,72 @@
         opacity: 1;
       }
       .hidden {
-        display: none;
+        display: none !important;
       }
+
+      /* Landing page styles */
+      .landing-view {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 60px;
+        text-align: center;
+        padding-top: 80px;
+      }
+      .landing-view.hidden {
+        display: none !important;
+      }
+      .landing-title {
+        margin: 0;
+        font-size: clamp(48px, 8vw, 80px);
+        font-weight: 300;
+        color: #ffffff;
+        line-height: 1.2;
+      }
+      .landing-title .brand {
+        font-weight: 400;
+      }
+      .landing-title .ai-text {
+        font-weight: 300;
+      }
+      .start-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 30px;
+        padding: 40px 80px;
+        font-size: 48px;
+        font-weight: 400;
+        color: #ffffff;
+        background: transparent;
+        border: 4px solid #ffffff;
+        border-radius: 80px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+      .start-button:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateX(4px);
+      }
+      .start-button .arrow {
+        font-size: 52px;
+        transition: transform 0.3s ease;
+      }
+      .start-button:hover .arrow {
+        transform: translateX(4px);
+      }
+
       @media (max-width: 720px) {
         .cards {
           grid-template-columns: 1fr;
+        }
+        .landing-title {
+          font-size: clamp(36px, 10vw, 48px);
+        }
+        .start-button {
+          font-size: 20px;
+          padding: 20px 36px;
         }
       }
     </style>
@@ -155,9 +221,16 @@
     <div class="overlay" aria-hidden="true"></div>
 
     <main class="wrap" aria-live="polite">
-      <!-- <h1>How would you like to call into the AI Agent today?</h1> -->
+      <!-- Landing page view (shown when type is NOT wbx1) -->
+      <div id="landingView" class="landing-view hidden">
+        <button class="start-button" id="startButton">
+          Start my AI Agent Experience
+          <span class="arrow">→</span>
+        </button>
+      </div>
 
-      <section class="cards">
+      <!-- Cards view (shown when type is wbx1) -->
+      <section id="cardsView" class="cards hidden">
         <!-- Card 1: Desk Pro -->
         <article
           class="card"
@@ -205,11 +278,36 @@
           deviceId: params.get("device_id"),
           deviceDialNumber: params.get("device_dial_number"),
           mobileDialNumber: params.get("mobile_dial_number"),
+          type: params.get("type"),
         };
       }
 
       // Get URL parameters
       const urlParams = getURLParams();
+
+      // Set background image and view based on type parameter
+      const isWbx1 = urlParams.type === "wbx1";
+      const backgroundImage = isWbx1
+        ? "./assets/Landing_screen_BG.png"
+        : "./assets/Landing-screen-full-logo-only.png";
+      document.body.style.background = `url("${backgroundImage}") center/cover no-repeat fixed`;
+
+      // Show/hide appropriate view
+      const landingView = document.getElementById("landingView");
+      const cardsView = document.getElementById("cardsView");
+      const wrapElement = document.querySelector(".wrap");
+
+      if (isWbx1) {
+        // Show cards view for wbx1 type
+        cardsView.classList.remove("hidden");
+        landingView.classList.add("hidden");
+        wrapElement.classList.add("has-cards");
+      } else {
+        // Show landing page for all other cases
+        landingView.classList.remove("hidden");
+        cardsView.classList.add("hidden");
+        wrapElement.classList.remove("has-cards");
+      }
 
       // Configuration with URL params as priority, GitHub variables as fallback
       const WEBEX_BEARER = urlParams.botToken || "__BOT_TOKEN__";
@@ -301,8 +399,17 @@
         });
       }
 
-      makeActivable(document.getElementById("deskproCard"), callDeskPro);
-      makeActivable(document.getElementById("mobileCard"), callMobile);
+      // Setup event handlers for cards (only when visible)
+      if (isWbx1) {
+        makeActivable(document.getElementById("deskproCard"), callDeskPro);
+        makeActivable(document.getElementById("mobileCard"), callMobile);
+      }
+
+      // Setup event handler for landing page start button
+      if (!isWbx1) {
+        const startButton = document.getElementById("startButton");
+        makeActivable(startButton, callDeskPro);
+      }
     </script>
   </body>
 </html>
