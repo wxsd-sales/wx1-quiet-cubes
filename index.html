@@ -10,8 +10,8 @@
     />
     <style>
       :root {
-        --card-w: 800px;
-        --gap: 70px;
+        --card-w: 350px;
+        --gap: 60px;
       }
       * {
         box-sizing: border-box;
@@ -50,7 +50,7 @@
         min-height: 100vh;
       }
       .wrap.has-cards {
-        padding-top: 1000px;
+        padding-top: 350px;
         justify-content: flex-start;
       }
       /* .sr-only {
@@ -78,9 +78,9 @@
       }
       .card {
         width: var(--card-w);
-        /* max-width: 85vw;
-        height: 450px;
-        background: rgba(255, 255, 255, 0.85); */
+        max-width: 45vw;
+        height: 350px;
+        background: rgba(255, 255, 255, 0.85);
         /* border: 2px solid rgba(0, 0, 0, 0.15); */
         border-radius: 14px;
         padding: 0;
@@ -177,15 +177,15 @@
         font-weight: 300;
       }
       .start-button {
-        display: inline-flex;
+        /* display: inline-flex; */
         align-items: center;
         gap: 30px;
-        padding: 40px 80px;
-        font-size: 48px;
+        padding: 18px 28px;
+        font-size: 30px;
         font-weight: 400;
         color: #ffffff;
         background: transparent;
-        border: 4px solid #ffffff;
+        border: 1px solid #ffffff;
         border-radius: 80px;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -196,7 +196,7 @@
         transform: translateX(4px);
       }
       .start-button .arrow {
-        font-size: 52px;
+        font-size: 30px;
         transition: transform 0.3s ease;
       }
       .start-button:hover .arrow {
